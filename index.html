@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Prueba válvula</title>
+  <title>Valvula SCADA</title>
   <style>
-    body { margin: 0; background: #0f172a; }
+    body { margin: 0; overflow: hidden; background: #0f172a; }
   </style>
 </head>
 <body>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/controls/OrbitControls.js"></script>
 
 <script>
 const scene = new THREE.Scene();
@@ -17,9 +18,14 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 10000);
 camera.position.set(0, 0, 10);
 
-const renderer = new THREE.WebGLRenderer();
+const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
+
+// 🎮 CONTROLES (AQUÍ ESTÁ EL MOVIMIENTO)
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.enablePan = false;
 
 // luces
 scene.add(new THREE.AmbientLight(0xffffff, 2));
@@ -28,14 +34,15 @@ const light = new THREE.DirectionalLight(0xffffff, 2);
 light.position.set(5,5,5);
 scene.add(light);
 
-// cargar modelo
+let valve;
+
 const loader = new THREE.GLTFLoader();
 
 loader.load('valvula.glb', function(gltf) {
 
-    const valve = gltf.scene;
+    valve = gltf.scene;
 
-    // centrar modelo
+    // centrar
     const box = new THREE.Box3().setFromObject(valve);
     const center = box.getCenter(new THREE.Vector3());
     valve.position.sub(center);
@@ -48,12 +55,19 @@ loader.load('valvula.glb', function(gltf) {
 
     scene.add(valve);
 
-    // render UNA VEZ
-    renderer.render(scene, camera);
+    controls.target.set(0,0,0);
+    controls.update();
 
-}, undefined, function(error) {
-    console.error("Error:", error);
 });
+
+// 🔄 animación necesaria para mover con mouse
+function animate() {
+    requestAnimationFrame(animate);
+
+    controls.update();
+    renderer.render(scene, camera);
+}
+animate();
 </script>
 
 </body>
