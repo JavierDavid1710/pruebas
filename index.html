@@ -1,9 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Valvula Wireframe</title>
+  <title>Valvula SCADA PRO</title>
   <style>
-    body { margin: 0; overflow: hidden; background: #0f172a; }
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: radial-gradient(circle, #1e293b, #020617);
+    }
   </style>
 </head>
 <body>
@@ -15,49 +19,68 @@
 <script>
 const scene = new THREE.Scene();
 
+// 📷 cámara
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 10000);
 camera.position.set(0, 0, 10);
 
+// 🎥 renderer mejorado
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.outputEncoding = THREE.sRGBEncoding;
 document.body.appendChild(renderer.domElement);
 
 // 🎮 controles
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.enablePan = false;
+controls.enableDamping = true;
 
-// luces (aunque wireframe no depende mucho)
-scene.add(new THREE.AmbientLight(0xffffff, 1));
+// 💡 ILUMINACIÓN PRO
+scene.add(new THREE.AmbientLight(0xffffff, 0.6));
 
-// loader
+const light1 = new THREE.DirectionalLight(0xffffff, 2);
+light1.position.set(5, 10, 7);
+scene.add(light1);
+
+const light2 = new THREE.DirectionalLight(0xffffff, 1);
+light2.position.set(-5, 5, -5);
+scene.add(light2);
+
+const backLight = new THREE.DirectionalLight(0xffffff, 1);
+backLight.position.set(0, -5, -10);
+scene.add(backLight);
+
+// 📦 loader
 const loader = new THREE.GLTFLoader();
 
 loader.load('valvula.glb', function(gltf) {
 
     const valve = gltf.scene;
 
-    // 🔴 CENTRAR MODELO
+    // 🔴 centrar modelo
     const box = new THREE.Box3().setFromObject(valve);
     const center = box.getCenter(new THREE.Vector3());
     valve.position.sub(center);
-    valve.position.y -= 2;
 
-    // 🔧 ESCALAR
+    // 🔽 bajar válvula
+    valve.position.y -= 1.5;
+
+    // 🔧 escalar automático
     const size = box.getSize(new THREE.Vector3());
     const maxDim = Math.max(size.x, size.y, size.z);
     const scale = 5 / maxDim;
     valve.scale.setScalar(scale);
 
-    // 🔥 CONVERTIR TODO A WIREFRAME
-valve.traverse((child) => {
-    if (child.isMesh) {
-        child.material = new THREE.MeshStandardMaterial({
-            color: 0x999999,
-            metalness: 0.3,
-            roughness: 0.6
-        });
-    }
-});
+    // 🎨 MATERIAL PRO (tipo válvula real)
+    valve.traverse((child) => {
+        if (child.isMesh) {
+            child.material = new THREE.MeshStandardMaterial({
+                color: 0x1e40af, // 🔥 azul industrial
+                metalness: 0.4,
+                roughness: 0.3
+            });
+        }
+    });
 
     scene.add(valve);
 
@@ -66,13 +89,20 @@ valve.traverse((child) => {
 
 });
 
-// render loop
+// 🔄 render loop
 function animate() {
     requestAnimationFrame(animate);
     controls.update();
     renderer.render(scene, camera);
 }
 animate();
+
+// 📐 resize
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
 </script>
 
 </body>
