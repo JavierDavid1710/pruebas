@@ -49,14 +49,15 @@ loader.load('valvula.glb', function(gltf) {
     valve.scale.setScalar(scale);
 
     // 🔥 CONVERTIR TODO A WIREFRAME
-    valve.traverse((child) => {
-        if (child.isMesh) {
-            child.material = new THREE.MeshBasicMaterial({
-                color: 0xffffff,
-                wireframe: true
-            });
-        }
-    });
+valve.traverse((child) => {
+    if (child.isMesh) {
+        child.material = new THREE.MeshStandardMaterial({
+            color: 0x999999,
+            metalness: 0.3,
+            roughness: 0.6
+        });
+    }
+});
 
     scene.add(valve);
 
