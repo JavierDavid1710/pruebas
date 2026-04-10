@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Valvula SCADA</title>
+  <title>Valvula Wireframe</title>
   <style>
     body { margin: 0; overflow: hidden; background: #0f172a; }
   </style>
@@ -22,36 +22,40 @@ const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// 🎮 CONTROLES (AQUÍ ESTÁ EL MOVIMIENTO)
+// 🎮 controles
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
 controls.enablePan = false;
 
-// luces
-scene.add(new THREE.AmbientLight(0xffffff, 2));
+// luces (aunque wireframe no depende mucho)
+scene.add(new THREE.AmbientLight(0xffffff, 1));
 
-const light = new THREE.DirectionalLight(0xffffff, 2);
-light.position.set(5,5,5);
-scene.add(light);
-
-let valve;
-
+// loader
 const loader = new THREE.GLTFLoader();
 
 loader.load('valvula.glb', function(gltf) {
 
-    valve = gltf.scene;
+    const valve = gltf.scene;
 
-    // centrar
+    // 🔴 CENTRAR MODELO
     const box = new THREE.Box3().setFromObject(valve);
     const center = box.getCenter(new THREE.Vector3());
     valve.position.sub(center);
 
-    // escalar automático
+    // 🔧 ESCALAR
     const size = box.getSize(new THREE.Vector3());
     const maxDim = Math.max(size.x, size.y, size.z);
     const scale = 5 / maxDim;
     valve.scale.setScalar(scale);
+
+    // 🔥 CONVERTIR TODO A WIREFRAME
+    valve.traverse((child) => {
+        if (child.isMesh) {
+            child.material = new THREE.MeshBasicMaterial({
+                color: 0x00ffcc,
+                wireframe: true
+            });
+        }
+    });
 
     scene.add(valve);
 
@@ -60,10 +64,9 @@ loader.load('valvula.glb', function(gltf) {
 
 });
 
-// 🔄 animación necesaria para mover con mouse
+// render loop
 function animate() {
     requestAnimationFrame(animate);
-
     controls.update();
     renderer.render(scene, camera);
 }
