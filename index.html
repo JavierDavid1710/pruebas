@@ -8,11 +8,12 @@
 </head>
 <body>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/loaders/GLTFLoader.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/controls/OrbitControls.js"></script>
+<script type="module">
 
-<script>
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js';
+import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/loaders/GLTFLoader.js';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/controls/OrbitControls.js';
+
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
@@ -22,20 +23,20 @@ const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// 🎮 controles con mouse
-const controls = new THREE.OrbitControls(camera, renderer.domElement);
+// controles
+const controls = new OrbitControls(camera, renderer.domElement);
 
-// 🔆 luces
+// luces
 scene.add(new THREE.AmbientLight(0xffffff, 1.5));
 
 const light = new THREE.DirectionalLight(0xffffff, 2);
 light.position.set(5,5,5);
 scene.add(light);
 
-// loader
-const loader = new THREE.GLTFLoader();
-
 let valve;
+
+// loader
+const loader = new GLTFLoader();
 
 loader.load(
   'https://threejs.org/examples/models/gltf/DamagedHelmet/glTF-Binary/DamagedHelmet.glb',
@@ -50,14 +51,8 @@ loader.load(
 
     scene.add(valve);
 
-    // enfocar cámara
     controls.target.set(0,0,0);
     controls.update();
-
-  },
-  undefined,
-  function(error) {
-    console.error("Error cargando modelo:", error);
   }
 );
 
@@ -74,12 +69,13 @@ function animate() {
 }
 animate();
 
-// resize automático
+// resize
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth/window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
+
 </script>
 
 </body>
