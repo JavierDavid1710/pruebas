@@ -40,6 +40,7 @@ loader.load('valvula.glb', function(gltf) {
     const box = new THREE.Box3().setFromObject(valve);
     const center = box.getCenter(new THREE.Vector3());
     valve.position.sub(center);
+    valve.position.y -= 2;
 
     // 🔧 ESCALAR
     const size = box.getSize(new THREE.Vector3());
@@ -51,7 +52,7 @@ loader.load('valvula.glb', function(gltf) {
     valve.traverse((child) => {
         if (child.isMesh) {
             child.material = new THREE.MeshBasicMaterial({
-                color: 0x00ffcc,
+                color: 0xffffff,
                 wireframe: true
             });
         }
