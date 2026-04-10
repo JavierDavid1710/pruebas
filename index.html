@@ -21,15 +21,14 @@ const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// Luz
-const light = new THREE.DirectionalLight(0xffffff, 1);
+// luces
+scene.add(new THREE.AmbientLight(0xffffff, 1));
+
+const light = new THREE.DirectionalLight(0xffffff, 2);
 light.position.set(5,5,5);
 scene.add(light);
 
-// Luz ambiental
-scene.add(new THREE.AmbientLight(0x404040, 2));
-
-// Cargar modelo
+// loader
 const loader = new THREE.GLTFLoader();
 
 let valve;
@@ -37,33 +36,25 @@ let valve;
 loader.load('valvula.glb', function(gltf) {
     valve = gltf.scene;
 
-    // Ajuste de escala
     valve.scale.set(1,1,1);
-
-    // Posición
     valve.position.set(0,0,0);
 
     scene.add(valve);
+}, undefined, function(error) {
+    console.error("Error cargando modelo:", error);
 });
 
-// Animación
+// animación
 function animate() {
     requestAnimationFrame(animate);
 
     if (valve) {
-        valve.rotation.y += 0.01; // giro
+        valve.rotation.y += 0.01;
     }
 
     renderer.render(scene, camera);
 }
 animate();
-
-// Resize automático
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth/window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-});
 </script>
 
 </body>
